@@ -1,7 +1,7 @@
 const express = require('express');
 
 const app = express();
-app.use(apiCredentials);
+// app.use(apiCredentials);
 app.use(express.json());
 
 const talkers = require('./talker.json');
