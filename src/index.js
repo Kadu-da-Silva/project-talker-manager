@@ -3,10 +3,20 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const talker = require('./talker');
+const talkers = require('./talker.json');
 
 app.get('/talker', (req, res) => {
-  res.status(200).json(talker);
+  res.status(200).json(talkers);
+});
+
+app.get('/talker/:id', (req, res) => {
+  const { id } = req.params;
+  const talker = talkers.find(t => t.id === Number(id));
+  if (talker) {
+    res.status(200).json(talker);
+  } else {
+    res.status(404).json({ "message": "Pessoa palestrante não encontrada" });
+  }
 });
 
 const HTTP_OK_STATUS = 200;
