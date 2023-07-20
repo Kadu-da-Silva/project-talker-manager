@@ -11,11 +11,11 @@ app.get('/talker', (req, res) => {
 
 app.get('/talker/:id', (req, res) => {
   const { id } = req.params;
-  const talker = talkers.find(t => t.id === Number(id));
+  const talker = talkers.find((t) => t.id === Number(id));
   if (talker) {
     res.status(200).json(talker);
   } else {
-    res.status(404).json({ "message": "Pessoa palestrante não encontrada" });
+    res.status(404).json({ 'message': 'Pessoa palestrante não encontrada' });
   }
 });
 
