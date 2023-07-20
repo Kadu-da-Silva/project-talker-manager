@@ -3,6 +3,12 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+const talker = require('./talker');
+
+app.get('/talker', (req, res) => {
+  res.status(200).json(talker);
+});
+
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
 
