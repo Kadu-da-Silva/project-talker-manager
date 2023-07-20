@@ -1,6 +1,7 @@
 const express = require('express');
 
 const app = express();
+app.use(apiCredentials);
 app.use(express.json());
 
 const talkers = require('./talker.json');
@@ -15,7 +16,7 @@ app.get('/talker/:id', (req, res) => {
   if (talker) {
     res.status(200).json(talker);
   } else {
-    res.status(404).json({ 'message': 'Pessoa palestrante não encontrada' });
+    res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
 });
 
