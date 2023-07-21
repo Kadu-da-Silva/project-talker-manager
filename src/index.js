@@ -5,8 +5,10 @@ app.use(express.json());
 
 const crypto = require('crypto');
 const talkers = require('./talker.json');
+const validToken = require('./middlewares/validToken');
 const validEmail = require('./middlewares/validEmail');
 const validPassword = require('./middlewares/validPassword');
+const { validAge, validName, validTalk } = require('./middlewares/validNewTalker');
 
 // 1 - Crie o endpoint GET /talker
 
@@ -40,6 +42,36 @@ app.post('/login', validEmail, validPassword, (req, res) => {
   const token = generateRandomToken(16);
   res.status(200).json({ token: `${token}` });
 });
+
+// Variável global para rastrear o último ID usado
+let lastId = 0;
+
+// 5 - Crie o endpoint POST /talker
+app.post('/talker', validToken, validName, validAge, validTalk,  (req, res) => {
+  const { name, age, talk } = req.body;
+
+  // Incrementar o ID para o próximo palestrante
+  lastId++;
+
+  // Criar o novo palestrante com as informações fornecidas
+  const newTalker = {
+    id: lastId,
+    name,
+    age,
+    talk: {
+      watchedAt: talk.watchedAt,
+      rate: talk.rate
+    }
+  };
+
+  // Adicionar o novo palestrante ao array de talkers
+  talkers.push(newTalker);
+
+  // Retornar somente as informações do novo palestrante
+  res.status(201).json(newTalker);
+});
+
+// Servidor
 
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
