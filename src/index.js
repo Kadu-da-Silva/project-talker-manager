@@ -8,7 +8,13 @@ const talkers = require('./talker.json');
 const validToken = require('./middlewares/validToken');
 const validEmail = require('./middlewares/validEmail');
 const validPassword = require('./middlewares/validPassword');
-const { validAge, validName, validTalk } = require('./middlewares/validNewTalker');
+const {
+  validAge,
+  validName,
+  validTalk,
+  validWatchedAt,
+  validRate,
+} = require('./middlewares/validNewTalker');
 
 // 1 - Crie o endpoint GET /talker
 
@@ -47,12 +53,17 @@ app.post('/login', validEmail, validPassword, (req, res) => {
 let lastId = 0;
 
 // 5 - Crie o endpoint POST /talker
-app.post('/talker', validToken, validName, validAge, validTalk,  (req, res) => {
+app.post('/talker',
+validToken,
+validName,
+validAge,
+validTalk,
+validWatchedAt,
+validRate,
+(req, res) => {
   const { name, age, talk } = req.body;
-
   // Incrementar o ID para o próximo palestrante
-  lastId++;
-
+  lastId += 1;
   // Criar o novo palestrante com as informações fornecidas
   const newTalker = {
     id: lastId,
@@ -60,10 +71,9 @@ app.post('/talker', validToken, validName, validAge, validTalk,  (req, res) => {
     age,
     talk: {
       watchedAt: talk.watchedAt,
-      rate: talk.rate
-    }
+      rate: talk.rate,
+    },
   };
-
   // Adicionar o novo palestrante ao array de talkers
   talkers.push(newTalker);
 
