@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 const talkersPath = path.resolve(__dirname, '..', './talker.json');
 
 const readFile = () => {

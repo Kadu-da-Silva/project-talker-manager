@@ -1,12 +1,10 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 app.use(express.json());
 
 const crypto = require('crypto');
-const validId = require('./middlewares/validId')
+const validId = require('./middlewares/validId');
 const validToken = require('./middlewares/validToken');
 const validEmail = require('./middlewares/validEmail');
 const validPassword = require('./middlewares/validPassword');
@@ -17,23 +15,9 @@ const {
   validWatchedAt,
   validRate,
 } = require('./middlewares/validNewTalker');
+
 const readFile = require('./utils/readFile');
-
-const talkersPath = path.resolve(__dirname, './talker.json');
-
-const saveDataToFile = (data) => {
-  const jsonData = JSON.stringify(data);
-  fs.writeFileSync(talkersPath, jsonData);
-};
-
-// const readFile = () => {
-//   try {
-//     const jsonData = fs.readFileSync(talkersPath);
-//     return JSON.parse(jsonData);
-//   } catch (error) {
-//     return [];
-//   }
-// };
+const saveDataToFile = require('./utils/saveDataToFile');
 
 // Servidor
 
@@ -58,8 +42,6 @@ app.get('/talker/search', validToken, (req, res) => {
   const talkers = readFile();
   const searchTerm = req.query.q;
 
-  console.log('d', typeof searchTerm);
-
   if (searchTerm === undefined) {
     return res.status(200).json([]);
   }
@@ -68,13 +50,13 @@ app.get('/talker/search', validToken, (req, res) => {
     return res.status(200).json(talkers);
   }
 
-  const filteredTalkers = talkers.filter((talker) => talker.name.includes(searchTerm))
+  const filteredTalkers = talkers.filter((talker) => talker.name.includes(searchTerm));
 
   if (!filteredTalkers) {
     return res.status(200).json([]);
   }
 
-  res.status(200).json(filteredTalkers)
+  res.status(200).json(filteredTalkers);
 });
 
 // 2 - Crie o endpoint GET /talker/:id
@@ -126,7 +108,6 @@ validRate,
       rate: talk.rate,
     },
   };
-  // Adicionar o novo palestrante ao array de talkers
   talkers.push(newTalker);
   // Salvar os dados atualizados no arquivo JSON
   saveDataToFile(talkers);
