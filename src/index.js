@@ -129,6 +129,21 @@ validRate,
   res.status(200).json(updatedTalk);
 });
 
+// 7 - Crie o endpoint DELETE /talker/:id
+app.delete('/talker/:id',
+validToken,
+(req, res) => {
+  const { id } = req.params;
+
+  // Remover o palestrante do array usando o filter()
+  const updateTalkers = talkers.filter((t) => t.id !== Number(id));
+
+  // Salvar os dados atualizados no arquivo JSON
+  saveDataToFile(updateTalkers);
+
+  res.status(204).end();
+});
+
 // Servidor
 
 const HTTP_OK_STATUS = 200;
