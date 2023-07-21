@@ -6,6 +6,7 @@ const app = express();
 app.use(express.json());
 
 const crypto = require('crypto');
+const validId = require('./middlewares/validId')
 const validToken = require('./middlewares/validToken');
 const validEmail = require('./middlewares/validEmail');
 const validPassword = require('./middlewares/validPassword');
@@ -16,6 +17,7 @@ const {
   validWatchedAt,
   validRate,
 } = require('./middlewares/validNewTalker');
+const readFile = require('./utils/readFile');
 
 const talkersPath = path.resolve(__dirname, './talker.json');
 
@@ -24,36 +26,61 @@ const saveDataToFile = (data) => {
   fs.writeFileSync(talkersPath, jsonData);
 };
 
-const readFile = () => {
-  try {
-    const jsonData = fs.readFileSync(talkersPath);
-    return JSON.parse(jsonData);
-  } catch (error) {
-    return [];
-  }
-};
+// const readFile = () => {
+//   try {
+//     const jsonData = fs.readFileSync(talkersPath);
+//     return JSON.parse(jsonData);
+//   } catch (error) {
+//     return [];
+//   }
+// };
 
-const talkers = readFile();
-// const talkers = require('./talker.json');
+// Servidor
+
+const HTTP_OK_STATUS = 200;
+const PORT = process.env.PORT || '3001';
+
+// não remova esse endpoint, e para o avaliador funcionar
+app.get('/', (_request, response) => {
+  response.status(HTTP_OK_STATUS).send();
+});
 
 // 1 - Crie o endpoint GET /talker
 
 app.get('/talker', (req, res) => {
+  const talkers = readFile();
   res.status(200).json(talkers);
+});
+
+// 8 - Crie o endpoint GET /talker/search e o parâmetro de consulta q=searchTerm
+
+app.get('/talker/search', validToken, (req, res) => {
+  const talkers = readFile();
+  const searchTerm = req.query.q;
+
+  console.log('d', typeof searchTerm);
+
+  if (searchTerm === undefined) {
+    return res.status(200).json([]);
+  }
+
+  if (searchTerm === '') {
+    return res.status(200).json(talkers);
+  }
+
+  const filteredTalkers = talkers.filter((talker) => talker.name.includes(searchTerm))
+
+  if (!filteredTalkers) {
+    return res.status(200).json([]);
+  }
+
+  res.status(200).json(filteredTalkers)
 });
 
 // 2 - Crie o endpoint GET /talker/:id
 
-const validId = (req, res, next) => {
-  const { id } = req.params;
-  const talker = talkers.find((t) => t.id === Number(id));
-  if (talker) {
-    return next();
-  }
-  res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-};
-
 app.get('/talker/:id', validId, (req, res) => {
+  const talkers = readFile();
   const { id } = req.params;
   const talker = talkers.find((t) => t.id === Number(id));
   if (talker) {
@@ -86,6 +113,7 @@ validTalk,
 validWatchedAt,
 validRate,
 (req, res) => {
+  const talkers = readFile();
   const { name, age, talk } = req.body;
   // Encontrar o maior ID atual na lista de talkers
   const lastId = talkers.reduce((maxId, talker) => Math.max(maxId, talker.id), 0);
@@ -110,13 +138,14 @@ validRate,
 
 app.put('/talker/:id',
 validToken,
-validId,
 validName,
 validAge,
 validTalk,
 validWatchedAt,
 validRate,
+validId,
 (req, res) => {
+  const talkers = readFile();
   const { id } = req.params;
   const talker = talkers.find((t) => t.id === Number(id));
   const indexArray = talkers.indexOf(talker);
@@ -130,9 +159,8 @@ validRate,
 });
 
 // 7 - Crie o endpoint DELETE /talker/:id
-app.delete('/talker/:id',
-validToken,
-(req, res) => {
+app.delete('/talker/:id', validToken, (req, res) => {
+  const talkers = readFile();
   const { id } = req.params;
 
   // Remover o palestrante do array usando o filter()
@@ -142,16 +170,6 @@ validToken,
   saveDataToFile(updateTalkers);
 
   res.status(204).end();
-});
-
-// Servidor
-
-const HTTP_OK_STATUS = 200;
-const PORT = process.env.PORT || '3001';
-
-// não remova esse endpoint, e para o avaliador funcionar
-app.get('/', (_request, response) => {
-  response.status(HTTP_OK_STATUS).send();
 });
 
 app.listen(PORT, () => {
