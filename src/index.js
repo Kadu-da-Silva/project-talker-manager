@@ -118,9 +118,9 @@ validWatchedAt,
 validRate,
 (req, res) => {
   const { id } = req.params;
-  const talker = talkers.find((t) => t.id === id);
+  const talker = talkers.find((t) => t.id === Number(id));
   const indexArray = talkers.indexOf(talker);
-  const updatedTalk = { id, ...req.body };
+  const updatedTalk = { id: Number(id), ...req.body };
   talkers.splice(indexArray, 1, updatedTalk);
 
   // Salvar os dados atualizados no arquivo JSON
