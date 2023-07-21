@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -14,9 +16,6 @@ const {
   validWatchedAt,
   validRate,
 } = require('./middlewares/validNewTalker');
-
-const fs = require('fs');
-const path = require('path');
 
 const talkersPath = path.resolve(__dirname, './talker.json');
 
@@ -90,7 +89,6 @@ validRate,
   const { name, age, talk } = req.body;
   // Encontrar o maior ID atual na lista de talkers
   const lastId = talkers.reduce((maxId, talker) => Math.max(maxId, talker.id), 0);
-  // Criar o novo palestrante com as informações fornecidas
   const newTalker = {
     id: lastId + 1,
     name,
@@ -102,10 +100,8 @@ validRate,
   };
   // Adicionar o novo palestrante ao array de talkers
   talkers.push(newTalker);
-
   // Salvar os dados atualizados no arquivo JSON
   saveDataToFile(talkers);
-
   // Retornar somente as informações do novo palestrante
   res.status(201).json(newTalker);
 });
@@ -123,9 +119,9 @@ validRate,
 (req, res) => {
   const { id } = req.params;
   const talker = talkers.find((t) => t.id === id);
-  const indexArray = teams.indexOf(talker);
+  const indexArray = talkers.indexOf(talker);
   const updatedTalk = { id, ...req.body };
-  teams.splice(indexArray, 1, updatedTalk);
+  talkers.splice(indexArray, 1, updatedTalk);
 
   // Salvar os dados atualizados no arquivo JSON
   saveDataToFile(talkers);
