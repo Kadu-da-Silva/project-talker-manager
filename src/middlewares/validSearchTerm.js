@@ -13,7 +13,6 @@ const validRate = (rate) => {
 
 const validRateTerm = (req, res, next) => {
   const { rate } = req.query;
-  console.log(rate);
 
   if (rate === undefined) {
     next();
@@ -28,13 +27,34 @@ const validRateTerm = (req, res, next) => {
   next();
 };
 
+const validDateTerm = (req, res, next) => {
+  const talkers = readFile();
+  const watchedAt = req.query.date;
+
+  if (watchedAt === undefined) {
+    next();
+  }
+  if (watchedAt === '') {
+    return res.status(200).json(talkers);
+  }
+
+  const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
+  const watchedAtValid = dateRegex.test(watchedAt);
+  if (!watchedAtValid) {
+    return res.status(400).json({
+      message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"',
+    });
+  }
+  next();
+};
+
 const validSearchTerm = (req, res, next) => {
   const talkers = readFile();
   const searchTerm = req.query.q;
   const { rate } = req.query;
-  console.log(searchTerm);
+  const watchedAt = req.query.date;
 
-  if (searchTerm === undefined && rate === undefined) {
+  if (searchTerm === undefined && rate === undefined && watchedAt === undefined) {
     return res.status(200).json([]);
   }
 
@@ -48,4 +68,5 @@ const validSearchTerm = (req, res, next) => {
 module.exports = {
   validSearchTerm,
   validRateTerm,
+  validDateTerm,
 };
