@@ -15,6 +15,7 @@ const {
   validWatchedAt,
   validRate,
 } = require('./middlewares/validNewTalker');
+const validSearchTerm = require('./middlewares/validSearchTerm');
 
 const readFile = require('./utils/readFile');
 const saveDataToFile = require('./utils/saveDataToFile');
@@ -37,20 +38,21 @@ app.get('/talker', (req, res) => {
 });
 
 // 8 - Crie o endpoint GET /talker/search e o parâmetro de consulta q=searchTerm
+// 9 - Crie no endpoint GET /talker/search o parâmetro de consulta rate=rateNumber
 
-app.get('/talker/search', validToken, (req, res) => {
+app.get('/talker/search', validToken, validSearchTerm, (req, res) => {
   const talkers = readFile();
   const searchTerm = req.query.q;
+  const rateNumber = Number(req.query.rate);
 
-  if (searchTerm === undefined) {
-    return res.status(200).json([]);
+  let filteredTalkers = talkers;
+  if (searchTerm) {
+    filteredTalkers = filteredTalkers.filter((talker) => talker.name.includes(searchTerm));
   }
 
-  if (searchTerm === '') {
-    return res.status(200).json(talkers);
+  if (rateNumber) {
+    filteredTalkers = filteredTalkers.filter((talker) => talker.talk.rate === rateNumber);
   }
-
-  const filteredTalkers = talkers.filter((talker) => talker.name.includes(searchTerm));
 
   if (!filteredTalkers) {
     return res.status(200).json([]);
