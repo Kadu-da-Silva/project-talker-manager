@@ -163,10 +163,9 @@ app.patch('/talker/rate/:id', validToken, (req, res) => {
   const { id } = req.params;
   const { rate } = req.body;
 
-  if (!rate && rate !== 0) {
-    res.status(400).json({ message: 'O campo "rate" é obrigatório'});
+  if (rate === undefined) {
+    res.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
-
   if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
     return res.status(400).json({ 
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
