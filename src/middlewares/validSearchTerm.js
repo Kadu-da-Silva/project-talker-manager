@@ -19,7 +19,7 @@ const validSearchTerm = (req, res, next) => {
     return res.status(200).json(talkers);
   }
 
-  if (validRate(rateNumber)) {
+  if (rateNumber && validRate(rateNumber)) {
     return res.status(400).json({ 
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
     });

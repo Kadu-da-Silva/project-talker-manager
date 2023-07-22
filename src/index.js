@@ -54,10 +54,6 @@ app.get('/talker/search', validToken, validSearchTerm, (req, res) => {
     filteredTalkers = filteredTalkers.filter((talker) => talker.talk.rate === rateNumber);
   }
 
-  if (!filteredTalkers) {
-    return res.status(200).json([]);
-  }
-
   res.status(200).json(filteredTalkers);
 });
 
