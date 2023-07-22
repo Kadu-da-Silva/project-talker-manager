@@ -15,7 +15,7 @@ const {
   validWatchedAt,
   validRate,
 } = require('./middlewares/validNewTalker');
-const validSearchTerm = require('./middlewares/validSearchTerm');
+const { validSearchTerm, validRateTerm } = require('./middlewares/validSearchTerm');
 
 const readFile = require('./utils/readFile');
 const saveDataToFile = require('./utils/saveDataToFile');
@@ -40,7 +40,7 @@ app.get('/talker', (req, res) => {
 // 8 - Crie o endpoint GET /talker/search e o parâmetro de consulta q=searchTerm
 // 9 - Crie no endpoint GET /talker/search o parâmetro de consulta rate=rateNumber
 
-app.get('/talker/search', validToken, validSearchTerm, (req, res) => {
+app.get('/talker/search', validToken, validSearchTerm, validRateTerm, (req, res) => {
   const talkers = readFile();
   const searchTerm = req.query.q;
   const rateNumber = Number(req.query.rate);
