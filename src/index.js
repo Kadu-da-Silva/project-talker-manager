@@ -39,6 +39,7 @@ app.get('/talker', (req, res) => {
 
 // 8 - Crie o endpoint GET /talker/search e o parâmetro de consulta q=searchTerm
 // 9 - Crie no endpoint GET /talker/search o parâmetro de consulta rate=rateNumber
+// 10 - Crie no endpoint GET /talker/search o parâmetro de consulta date=watchedDate
 
 app.get('/talker/search', validToken, validSearchTerm, validRateTerm, validDateTerm, (req, res) => {
   const talkers = readFile();
@@ -141,6 +142,7 @@ validId,
 });
 
 // 7 - Crie o endpoint DELETE /talker/:id
+
 app.delete('/talker/:id', validToken, (req, res) => {
   const talkers = readFile();
   const { id } = req.params;
@@ -151,6 +153,30 @@ app.delete('/talker/:id', validToken, (req, res) => {
   // Salvar os dados atualizados no arquivo JSON
   saveDataToFile(updateTalkers);
 
+  res.status(204).end();
+});
+
+// 11 - Crie o endpoint PATCH /talker/rate/:id
+
+app.patch('/talker/rate/:id', validToken, (req, res) => {
+  const talkers = readFile();
+  const { id } = req.params;
+  const { rate } = req.body;
+
+  if (!rate && rate !== 0) {
+    res.status(400).json({ message: 'O campo "rate" é obrigatório'});
+  }
+
+  if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
+    return res.status(400).json({ 
+      message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+    });
+  }
+
+  const talkerIndex = talkers.findIndex((t) => t.id === Number(id));
+  talkers[talkerIndex].talk.rate = rate;
+
+  saveDataToFile(talkers);
   res.status(204).end();
 });
 
